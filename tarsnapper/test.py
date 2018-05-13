@@ -48,7 +48,7 @@ class BackupSimulator(object):
         keep = self.expire_func(self.backups, self.deltas)
         deleted = []
         for key in list(self.backups.keys()):
-            if not key in keep:
+            if key not in keep:
                 deleted.append(key)
                 del self.backups[key]
         return deleted, keep

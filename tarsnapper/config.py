@@ -74,7 +74,7 @@ def require_placeholders(text, placeholders, what):
     Raises a ``ConfigError`` using ``what`` in the message, or returns
     the unmodified text.
     """
-    if not text is None:
+    if text is not None:
         for var in placeholders:
             if Template(text).safe_substitute({var: 'foo'}) == text:
                 raise ConfigError(('%s must make use of the following '
@@ -116,6 +116,7 @@ def parse_deltas(delta_string):
 
     return deltas
 
+
 def parse_named_deltas(named_delta_dict):
     named_deltas = {}
     for name, deltas in named_delta_dict.items():
@@ -123,6 +124,7 @@ def parse_named_deltas(named_delta_dict):
             raise ConfigError(('%s: No deltas specified') % name)
         named_deltas[name] = parse_deltas(deltas)
     return named_deltas
+
 
 def load_config(text):
     """Load the config file and return a dict of jobs, with the local
@@ -147,7 +149,7 @@ def load_config(text):
         job_dict = job_dict or {}
         # sources
         if 'sources' in job_dict and 'source' in job_dict:
-            raise ConfigError(('%s: Use either the "source" or "sources" '+
+            raise ConfigError(('%s: Use either the "source" or "sources" ' +
                               'option, not both') % job_name)
         if 'source' in job_dict:
             sources = [job_dict.pop('source')]
@@ -155,7 +157,7 @@ def load_config(text):
             sources = job_dict.pop('sources', None)
         # aliases
         if 'aliases' in job_dict and 'alias' in job_dict:
-            raise ConfigError(('%s: Use either the "alias" or "aliases" '+
+            raise ConfigError(('%s: Use either the "alias" or "aliases" ' +
                               'option, not both') % job_name)
         if 'alias' in job_dict:
             aliases = [job_dict.pop('alias')]
@@ -163,7 +165,7 @@ def load_config(text):
             aliases = job_dict.pop('aliases', None)
         # excludes
         if 'excludes' in job_dict and 'exclude' in job_dict:
-            raise ConfigError(('%s: Use either the "excludes" or "exclude" '+
+            raise ConfigError(('%s: Use either the "excludes" or "exclude" ' +
                               'option, not both') % job_name)
         if 'exclude' in job_dict:
             excludes = [job_dict.pop('exclude')]
@@ -171,13 +173,13 @@ def load_config(text):
             excludes = job_dict.pop('excludes', [])
         # deltas
         if 'deltas' in job_dict and 'delta' in job_dict:
-            raise ConfigError(('%s: Use either the "deltas" or "delta" '+
+            raise ConfigError(('%s: Use either the "deltas" or "delta" ' +
                               'option, not both') % job_name)
         if 'delta' in job_dict:
             delta_name = job_dict.pop('delta', None)
             if delta_name not in named_deltas:
                 raise ConfigError(('%s: Named delta "%s" not defined')
-                                  % (job_name,delta_name))
+                                  % (job_name, delta_name))
             deltas = named_deltas[delta_name]
         else:
             deltas = parse_deltas(job_dict.pop('deltas', None)) or default_deltas

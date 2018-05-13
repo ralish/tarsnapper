@@ -190,6 +190,7 @@ def test_source_and_sources():
           /var
     """)
 
+
 def test_alias_and_aliases():
     """You can't use both options at the same time."""
     assert_raises(ConfigError, load_config, """
@@ -203,6 +204,7 @@ def test_alias_and_aliases():
           moo
     """)
 
+
 def test_exclude_and_excludes():
     """You can't use both options at the same time."""
     assert_raises(ConfigError, load_config, """
@@ -215,6 +217,7 @@ def test_exclude_and_excludes():
           loo
           moo
     """)
+
 
 def test_named_delta():
     c = load_config("""
@@ -237,6 +240,7 @@ def test_named_delta():
     assert len(c[0]['foo'].deltas) == 3
     assert len(c[0]['bar'].deltas) == 4
 
+
 def test_unspecified_named_delta():
     assert_raises(ConfigError, load_config, """
     target: $name-$date
@@ -248,6 +252,7 @@ def test_unspecified_named_delta():
         delta: myDelta
     """)
 
+
 def test_undefined_named_delta():
     assert_raises(ConfigError, load_config, """
     target: $name-$date
@@ -258,6 +263,7 @@ def test_undefined_named_delta():
         source: /foo/
         delta: importantDelta
     """)
+
 
 def test_named_delta_and_deltas():
     """You can't use both named delta and deltas at the same time."""

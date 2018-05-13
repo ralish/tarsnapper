@@ -1,5 +1,4 @@
 import operator
-from datetime import datetime, timedelta
 
 
 __all__ = ('expire',)
@@ -50,7 +49,6 @@ def expire(backups, deltas):
     # First, sort the backups with most recent one first
     backups = [(name, time) for name, time in list(backups.items())]
     backups.sort(key=lambda x: x[1], reverse=True)
-    old_backups = backups[:]
 
     # Also make sure that we have the deltas in ascending order
     deltas = list(deltas[:])

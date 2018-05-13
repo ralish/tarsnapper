@@ -1,4 +1,3 @@
-from io import StringIO
 from os import path
 import re
 import shutil
@@ -176,7 +175,6 @@ class TestExpire(BaseTest):
         ])
         assert cmd.backend.match([])
 
-
     def test_something_to_expire(self):
         cmd = self.run(self.job(deltas='1d 2d'), [
             self.filename('1d'),
@@ -202,7 +200,7 @@ class TestExpire(BaseTest):
         we won't stumble over "home-dev-$date". This can be an issue
         due to the way we try to parse the dates in filenames.
         """
-        cmd = self.run(self.job(name="home"), [
+        self.run(self.job(name="home"), [
             self.filename('1d', name="home-dev"),
         ])
 
