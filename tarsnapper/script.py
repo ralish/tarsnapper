@@ -405,49 +405,74 @@ PLUGINS = [
 def parse_args(argv):
     """Parse the command line.
     """
+
     parser = argparse.ArgumentParser(
         description='An interface to tarsnap to manage backups.')
+
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-q', action='store_true', dest='quiet', help='be quiet')
-    group.add_argument('-v', action='store_true', dest='verbose', help='be verbose')
+    group.add_argument('-q',
+                       action='store_true',
+                       dest='quiet',
+                       help='be quiet')
+    group.add_argument('-v',
+                       action='store_true',
+                       dest='verbose',
+                       help='be verbose')
     # We really want nargs=(1,2), but since this isn't available, we can
     # just asl well support an arbitrary number of values for each -o.
-    parser.add_argument('-o', metavar=('name', 'value'), nargs='+',
-                        dest='tarsnap_options', default=[], action='append',
+    parser.add_argument('-o',
+                        action='append',
+                        default=[],
+                        dest='tarsnap_options',
+                        metavar=('name', 'value'),
+                        nargs='+',
                         help='option to pass to tarsnap',)
-    parser.add_argument('--config', '-c', help='use the given config file')
+    parser.add_argument('-c', '--config',
+                        help='use the given config file')
 
     group = parser.add_argument_group(
         description='Instead of using a configuration file, you may define '
                     'a single job on the command line:')
-    group.add_argument('--target', help='target filename for the backup')
-    group.add_argument('--sources', nargs='+', help='paths to backup',
-                       default=[])
-    group.add_argument('--deltas', '-d', metavar='DELTA',
+    group.add_argument('--target',
+                       help='target filename for the backup')
+    group.add_argument('--sources',
+                       default=[],
+                       nargs='+',
+                       help='paths to backup')
+    group.add_argument('-d', '--deltas',
+                       metavar='DELTA',
+                       nargs='+',
                        type=timedelta_string,
-                       help='generation deltas', nargs='+')
-    group.add_argument('--dateformat', '-f', help='dateformat')
+                       help='generation deltas')
+    group.add_argument('-f', '--dateformat',
+                       help='dateformat')
 
     for plugin in PLUGINS:
         plugin.setup_arg_parser(parser)
 
     # This will allow the user to break out of an nargs='*' to start
     # with the subcommand. See http://bugs.python.org/issue9571.
-    parser.add_argument('-', dest='__dummy', action="store_true",
+    parser.add_argument('-',
+                        action="store_true",
+                        dest='__dummy',
                         help=argparse.SUPPRESS)
 
     subparsers = parser.add_subparsers(
-        title="commands", description="commands may offer additional options")
+        title="commands",
+        description="commands may offer additional options")
+
     for cmd_name, cmd_klass in COMMANDS.items():
-        subparser = subparsers.add_parser(cmd_name, help=cmd_klass.help,
+        subparser = subparsers.add_parser(cmd_name,
+                                          add_help=False,
                                           description=cmd_klass.description,
-                                          add_help=False)
+                                          help=cmd_klass.help)
         subparser.set_defaults(command=cmd_klass)
         group = subparser.add_argument_group(
             title="optional arguments for this command")
         # We manually add the --help option so that we can have a
         # custom group title, but only show a single group.
-        group.add_argument('-h', '--help', action='help',
+        group.add_argument('-h', '--help',
+                           action='help',
                            default=argparse.SUPPRESS,
                            help='show this help message and exit')
         cmd_klass.setup_arg_parser(group)
@@ -455,7 +480,9 @@ def parse_args(argv):
         # Unfortunately, we need to redefine the jobs argument for each
         # command, rather than simply having it once, globally.
         subparser.add_argument(
-            'jobs', metavar='job', nargs='*',
+            'jobs',
+            metavar='job',
+            nargs='*',
             help='only process the given job as defined in the config file')
 
     # This would be in a group automatically, but it would be shown as
@@ -470,7 +497,9 @@ def parse_args(argv):
     # http://bugs.python.org/issue9540).
     group = parser.add_argument_group(title='positional arguments')
     group.add_argument(
-        '__not_used', metavar='job', nargs='*',
+        '__not_used',
+        metavar='job',
+        nargs='*',
         help='only process the given job as defined in the config file')
 
     args = parser.parse_args(argv)
@@ -493,9 +522,9 @@ def parse_args(argv):
 def main(argv):
     try:
         args = parse_args(argv)
-    except ArgumentError as e:
-        print("Error: %s" % e)
-        return 1
+    except ArgumentError as exc:
+        print("Error: %s" % exc)
+        return True
 
     # Setup logging
     level = logging.WARNING if args.quiet else (
@@ -541,9 +570,5 @@ def main(argv):
         return 1
 
 
-def run():
-    sys.exit(main(sys.argv[1:]) or 0)
-
-
 if __name__ == '__main__':
-    run()
+    sys.exit(main(sys.argv[1:]) or False)
